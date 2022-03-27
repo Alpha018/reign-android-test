@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ReignTest</string>
+    <string name="title_activity_detail_view">DetailView</string>
+</resources>
