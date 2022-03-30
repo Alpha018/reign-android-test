@@ -29,7 +29,11 @@ import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CardList(hits: MutableList<Hits>, navController: NavController) {
+fun CardList(
+    hits: List<Hits>,
+    onCardClicked: (Hits) -> Unit = {},
+    onItemRemoved: (Hits) -> Unit = {}
+) {
     val context = LocalContext.current
 
     LazyColumn(
@@ -43,7 +47,7 @@ fun CardList(hits: MutableList<Hits>, navController: NavController) {
             val dismissState = rememberDismissState(
                 confirmStateChange = {
                     if (it == DismissValue.DismissedToStart) {
-                        hits.remove(item)
+                        onItemRemoved(item)
                         Toast.makeText(
                             context,
                             "Noticia eliminada",
@@ -97,10 +101,7 @@ fun CardList(hits: MutableList<Hits>, navController: NavController) {
                 dismissContent = {
                     Card(
                         onClick = {
-                            val encodedUrl = URLEncoder.encode(item.storyUrl ?: "", StandardCharsets.UTF_8.toString())
-                            navController.navigate(
-                                route = "${AppScreens.DetailScreen.route}?url=$encodedUrl,title=${item.title ?: item.storyTitle ?: ""}"
-                            )
+                           onCardClicked(item)
                         },
                         shape = MaterialTheme.shapes.small,
                         border = BorderStroke(1.dp, Color.LightGray),
