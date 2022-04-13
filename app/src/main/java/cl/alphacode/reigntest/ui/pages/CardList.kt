@@ -1,6 +1,5 @@
 package cl.alphacode.reigntest.ui.pages
 
-import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -18,20 +17,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import cl.alphacode.reigntest.navigations.AppScreens
-import cl.alphacode.reigntest.service.algolia.responses.Hits
+import cl.alphacode.reigntest.model.News
 import cl.alphacode.reigntest.ui.organism.CardComponent
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CardList(hits: MutableList<Hits>, navController: NavController) {
-    val context = LocalContext.current
-
+fun CardList(
+    news: List<News>,
+    onCardClicked: (News) -> Unit = {},
+    onItemRemove: (News) -> Unit = {}
+) {
     LazyColumn(
         Modifier
             .fillMaxWidth()
@@ -39,16 +35,11 @@ fun CardList(hits: MutableList<Hits>, navController: NavController) {
         contentPadding = PaddingValues(0.dp, 5.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        items(hits, { it.createdAtI }) { item ->
+        items(news, { it.createdAtI }) { item ->
             val dismissState = rememberDismissState(
                 confirmStateChange = {
                     if (it == DismissValue.DismissedToStart) {
-                        hits.remove(item)
-                        Toast.makeText(
-                            context,
-                            "Noticia eliminada",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        onItemRemove(item)
                     }
                     true
                 }
@@ -97,10 +88,7 @@ fun CardList(hits: MutableList<Hits>, navController: NavController) {
                 dismissContent = {
                     Card(
                         onClick = {
-                            val encodedUrl = URLEncoder.encode(item.storyUrl ?: "", StandardCharsets.UTF_8.toString())
-                            navController.navigate(
-                                route = "${AppScreens.DetailScreen.route}?url=$encodedUrl,title=${item.title ?: item.storyTitle ?: ""}"
-                            )
+                            onCardClicked(item)
                         },
                         shape = MaterialTheme.shapes.small,
                         border = BorderStroke(1.dp, Color.LightGray),
@@ -109,7 +97,7 @@ fun CardList(hits: MutableList<Hits>, navController: NavController) {
                             targetValue = if (dismissState.dismissDirection != null) 4.dp else 0.dp
                         ).value
                     ) {
-                        CardComponent(hits = item)
+                        CardComponent(news = item)
                     }
                 }
             )

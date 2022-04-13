@@ -1,13 +1,9 @@
-package cl.alphacode.reigntest.service.algolia.responses
+package cl.alphacode.reigntest.model
 
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
-data class AlgoliaResponse(
-    var hits: List<Hits>,
-)
-
-data class Hits(
+data class News (
     var title: String?,
     var author: String,
     @SerializedName("created_at")

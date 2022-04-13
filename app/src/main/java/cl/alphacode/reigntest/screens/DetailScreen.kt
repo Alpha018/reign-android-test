@@ -10,11 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import cl.alphacode.reigntest.ui.atoms.CenterTextScreen
 import cl.alphacode.reigntest.ui.atoms.WebViewPage
 
 @Composable
-fun DetailScreen(navController: NavController, url: String?, title: String?) {
+fun DetailScreen(navController: NavController, url: String, title: String) {
     Scaffold(topBar = {
         TopAppBar {
             Icon(
@@ -25,16 +24,10 @@ fun DetailScreen(navController: NavController, url: String?, title: String?) {
                 }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            title?.let {
-                Text(text = title)
-            }
+            Text(text = title)
         }
     }) {
-        if (url.isNullOrBlank() || url == "undefined") {
-            CenterTextScreen(text = "Sin URL")
-        } else {
-            WebViewPage(url)
-        }
+        WebViewPage(url)
     }
 
 }

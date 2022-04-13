@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">ReignTest</string>
     <string name="title_activity_detail_view">DetailView</string>
+    <string name="no_title_or_url">La noticia no tiene título o URL</string>
+    <string name="loading_text">Cargando...</string>
+    <string name="news_deleted">Noticia eliminada</string>
 </resources>

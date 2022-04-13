@@ -8,7 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import cl.alphacode.reigntest.navigations.AppNavigation
 import cl.alphacode.reigntest.ui.theme.ReignTestTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

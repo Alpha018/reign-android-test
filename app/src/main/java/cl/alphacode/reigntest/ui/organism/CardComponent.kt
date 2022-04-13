@@ -10,16 +10,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cl.alphacode.reigntest.service.algolia.responses.Hits
+import cl.alphacode.reigntest.model.News
 import cl.alphacode.reigntest.ui.molecule.SubTitleData
 import org.ocpsoft.prettytime.PrettyTime
 import java.util.*
 
 
 @Composable
-fun CardComponent(hits: Hits) {
+fun CardComponent(news: News) {
     val prettyTime = PrettyTime(Locale.getDefault())
-    val ago: String = prettyTime.format(hits.createdAt)
+    val ago: String = prettyTime.format(news.createdAt)
 
     Column(
         modifier = Modifier
@@ -27,12 +27,12 @@ fun CardComponent(hits: Hits) {
             .padding(16.dp)
     ) {
         Text(
-            text = hits.title ?: hits.storyTitle ?: "",
+            text = news.title ?: news.storyTitle ?: "",
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-        SubTitleData(hits.author, ago)
+        SubTitleData(news.author, ago)
     }
 }
