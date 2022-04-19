@@ -20,10 +20,10 @@ import java.nio.charset.StandardCharsets
 
 @Composable
 fun MainScreen(
-    navController: NavController,
+    navigateToDetails: (String?, String) -> Unit,
     viewModel: ListScreenViewModel = hiltViewModel()
 ) {
-    val newsListResponse = viewModel.getNews().collectAsState()
+    val newsListResponse = viewModel.news.collectAsState()
     var refreshing by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -51,8 +51,6 @@ fun MainScreen(
                     ).show()
                 },
                 onCardClicked = {
-                    val encodedUrl = URLEncoder.encode(it.storyUrl ?: "", StandardCharsets.UTF_8.toString())
-                    val title = it.title ?: it.storyTitle ?: ""
                     if (encodedUrl.isNullOrBlank() || title.isBlank()) {
                         Toast.makeText(
                             context,
@@ -60,9 +58,7 @@ fun MainScreen(
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        navController.navigate(
-                            route = "${AppScreens.DetailScreen.route}?url=$encodedUrl,title=$title"
-                        )
+                        navigateToDetails(it.storyUrl ?: "", title)
                     }
                 }
             )
