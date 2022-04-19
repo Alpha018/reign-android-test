@@ -23,8 +23,8 @@ fun MainScreen(
     navController: NavController,
     viewModel: ListScreenViewModel = hiltViewModel()
 ) {
-    val newsListResponse = viewModel.getNews().collectAsState()
-    var refreshing by remember { mutableStateOf(false) }
+    val newsListResponse by viewModel.news.collectAsState()
+    val refreshing by viewModel.refreshing.collectAsState()
     val context = LocalContext.current
 
     SwipeRefresh(
@@ -33,15 +33,14 @@ fun MainScreen(
             .fillMaxHeight()
             .fillMaxWidth(),
         onRefresh = {
-            refreshing = true
-            refreshing = false
+            viewModel.getNews()
         },
     ) {
-        if (newsListResponse.value.isEmpty()) {
+        if (newsListResponse.isEmpty()) {
             CenterTextScreen(stringResource(R.string.loading_text))
         } else {
             CardList(
-                newsListResponse.value,
+                newsListResponse,
                 onItemRemove = {
                     viewModel.removeNews(it)
                     Toast.makeText(
