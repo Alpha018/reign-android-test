@@ -20,13 +20,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cl.alphacode.reigntest.model.News
 import cl.alphacode.reigntest.ui.organism.CardComponent
+import cl.alphacode.reigntest.ui.viewModel.NewsUi
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CardList(
-    news: List<News>,
-    onCardClicked: (News) -> Unit = {},
-    onItemRemove: (News) -> Unit = {}
+    news: List<NewsUi>,
+    onCardClicked: (NewsUi) -> Unit = {},
+    onItemRemove: (NewsUi) -> Unit = {}
 ) {
     LazyColumn(
         Modifier

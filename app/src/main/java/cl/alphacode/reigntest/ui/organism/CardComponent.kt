@@ -10,14 +10,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cl.alphacode.reigntest.model.News
 import cl.alphacode.reigntest.ui.molecule.SubTitleData
+import cl.alphacode.reigntest.ui.viewModel.NewsUi
 import org.ocpsoft.prettytime.PrettyTime
 import java.util.*
 
 
 @Composable
-fun CardComponent(news: News) {
+fun CardComponent(news: NewsUi) {
     val prettyTime = PrettyTime(Locale.getDefault())
     val ago: String = prettyTime.format(news.createdAt)
 
@@ -27,7 +27,7 @@ fun CardComponent(news: News) {
             .padding(16.dp)
     ) {
         Text(
-            text = news.title ?: news.storyTitle ?: "",
+            text = news.title,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1,

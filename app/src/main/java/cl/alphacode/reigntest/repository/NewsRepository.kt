@@ -11,13 +11,18 @@ interface NewsRepository {
 
 class NewsRepositoryImp @Inject constructor(
     private val newsProvider: NewsProvider
-): NewsRepository {
+) : NewsRepository {
 
     private var news: List<News> = emptyList()
 
     override suspend fun getNews(query: String): List<News> {
-        val apiResponse = newsProvider.getNews(query).body()
-        news = apiResponse?.hits ?: emptyList()
+        kotlin.runCatching {
+            val apiResponse = newsProvider.getNews(query)
+
+            if (apiResponse.isSuccessful) {
+                news = apiResponse.body()?.hits ?: emptyList()
+            }
+        }
         return news
     }
 
