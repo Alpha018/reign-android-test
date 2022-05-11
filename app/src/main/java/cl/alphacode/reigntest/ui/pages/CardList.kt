@@ -1,5 +1,6 @@
 package cl.alphacode.reigntest.ui.pages
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -29,79 +30,82 @@ fun CardList(
     onCardClicked: (NewsUi) -> Unit = {},
     onItemRemove: (NewsUi) -> Unit = {}
 ) {
-    LazyColumn(
-        Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        contentPadding = PaddingValues(0.dp, 5.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        items(news, { it.createdAtI }) { item ->
-            val dismissState = rememberDismissState(
-                confirmStateChange = {
-                    if (it == DismissValue.DismissedToStart) {
-                        onItemRemove(item)
-                    }
-                    true
-                }
-            )
-            SwipeToDismiss(
-                state = dismissState,
-                directions = setOf(DismissDirection.EndToStart),
-                dismissThresholds = { FractionalThreshold(0.2f) },
-                background = {
-                    val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
-                    val color by animateColorAsState(
-                        targetValue = when (dismissState.targetValue) {
-                            DismissValue.Default -> Color.LightGray
-                            DismissValue.DismissedToStart -> Color.Red
-                            else -> Color.LightGray
+    Crossfade(targetState = news) {
+        LazyColumn(
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            contentPadding = PaddingValues(0.dp, 5.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(it, { it.createdAtI }) { item ->
+                val dismissState = rememberDismissState(
+                    confirmStateChange = {
+                        if (it == DismissValue.DismissedToStart) {
+                            onItemRemove(item)
                         }
-                    )
-                    val icon = when (direction) {
-                        DismissDirection.EndToStart -> Icons.Default.Delete
-                        else -> Icons.Default.Delete
+                        true
                     }
-                    val scale by animateFloatAsState(
-                        targetValue = if (dismissState.targetValue == DismissValue.Default) 0.8f else 1.2f
-                    )
-                    val alignment = when (direction) {
-                        DismissDirection.EndToStart -> Alignment.CenterEnd
-                        else -> Alignment.CenterStart
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(color = color)
-                            .padding(16.dp),
-                        contentAlignment = alignment
-                    ) {
-                        Icon(
-                            icon,
-                            contentDescription = "Icon",
-                            modifier = Modifier
-                                .scale(scale = scale)
-                                .fillMaxHeight()
+                )
+                SwipeToDismiss(
+                    state = dismissState,
+                    directions = setOf(DismissDirection.EndToStart),
+                    dismissThresholds = { FractionalThreshold(0.2f) },
+                    background = {
+                        val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
+                        val color by animateColorAsState(
+                            targetValue = when (dismissState.targetValue) {
+                                DismissValue.Default -> Color.LightGray
+                                DismissValue.DismissedToStart -> Color.Red
+                                else -> Color.LightGray
+                            }
                         )
+                        val icon = when (direction) {
+                            DismissDirection.EndToStart -> Icons.Default.Delete
+                            else -> Icons.Default.Delete
+                        }
+                        val scale by animateFloatAsState(
+                            targetValue = if (dismissState.targetValue == DismissValue.Default) 0.8f else 1.2f
+                        )
+                        val alignment = when (direction) {
+                            DismissDirection.EndToStart -> Alignment.CenterEnd
+                            else -> Alignment.CenterStart
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = color)
+                                .padding(16.dp),
+                            contentAlignment = alignment
+                        ) {
+                            Icon(
+                                icon,
+                                contentDescription = "Icon",
+                                modifier = Modifier
+                                    .scale(scale = scale)
+                                    .fillMaxHeight()
+                            )
+                        }
+                    },
+                    dismissContent = {
+                        Card(
+                            onClick = {
+                                onCardClicked(item)
+                            },
+                            shape = MaterialTheme.shapes.small,
+                            border = BorderStroke(1.dp, Color.LightGray),
+                            modifier = Modifier.fillMaxWidth(),
+                            elevation = animateDpAsState(
+                                targetValue = if (dismissState.dismissDirection != null) 4.dp else 0.dp
+                            ).value
+                        ) {
+                            CardComponent(news = item)
+                        }
                     }
-                },
-                dismissContent = {
-                    Card(
-                        onClick = {
-                            onCardClicked(item)
-                        },
-                        shape = MaterialTheme.shapes.small,
-                        border = BorderStroke(1.dp, Color.LightGray),
-                        modifier = Modifier.fillMaxWidth(),
-                        elevation = animateDpAsState(
-                            targetValue = if (dismissState.dismissDirection != null) 4.dp else 0.dp
-                        ).value
-                    ) {
-                        CardComponent(news = item)
-                    }
-                }
-            )
+                )
+            }
         }
     }
+
 }
