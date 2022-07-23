@@ -1,9 +1,15 @@
 package cl.alphacode.reigntest.di
 
+import android.content.Context
+import androidx.room.Room
+import cl.alphacode.reigntest.dao.NewsDao
+import cl.alphacode.reigntest.database.AppDatabase
+import cl.alphacode.reigntest.entity.Converters
 import cl.alphacode.reigntest.provider.NewsProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +38,22 @@ class ProviderModule {
     @Singleton
     fun providerNewsProvider(retrofit: Retrofit): NewsProvider =
         retrofit.create(NewsProvider::class.java)
+
+    @Provides
+    fun provideNewsDao(appDatabase: AppDatabase): NewsDao {
+        return appDatabase.newsDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext appContext: Context): AppDatabase {
+        return Room.databaseBuilder(
+            appContext,
+            AppDatabase::class.java,
+            "NewsReader"
+        )
+            .build()
+    }
 
     @Provides
     @Named("ListScreenDispatcher")

@@ -1,6 +1,8 @@
 package cl.alphacode.reigntest.di
 
 import cl.alphacode.reigntest.repository.NewsRepository
+import cl.alphacode.reigntest.repository.NewsRepositoryDb
+import cl.alphacode.reigntest.repository.NewsRepositoryDbImp
 import cl.alphacode.reigntest.repository.NewsRepositoryImp
 import dagger.Binds
 import dagger.Module
@@ -14,4 +16,8 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun providerNewsRepository(repository: NewsRepositoryImp): NewsRepository
+
+    @Binds
+    @Singleton
+    fun providerNewsRepositoryDb(repository: NewsRepositoryDbImp): NewsRepositoryDb
 }

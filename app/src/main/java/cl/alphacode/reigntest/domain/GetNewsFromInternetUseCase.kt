@@ -5,7 +5,7 @@ import cl.alphacode.reigntest.repository.NewsRepository
 import cl.alphacode.reigntest.util.wrapEspressoIdlingResource
 import javax.inject.Inject
 
-class GetNewsUseCase @Inject constructor(
+class GetNewsFromInternetUseCase @Inject constructor(
     private val newsRepository: NewsRepository
 ) {
     suspend operator fun invoke(query: String): List<News> {

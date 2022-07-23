@@ -4,10 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cl.alphacode.reigntest.domain.GetNewsUseCase
+import cl.alphacode.reigntest.domain.*
+import cl.alphacode.reigntest.entity.News
 import cl.alphacode.reigntest.event.Event
-import cl.alphacode.reigntest.repository.NewsRepository
-import cl.alphacode.reigntest.ui.viewModel.NewsUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,12 +19,14 @@ import javax.inject.Named
 
 @HiltViewModel
 class ListScreenViewModel @Inject constructor(
-    private val repository: NewsRepository,
-    private val getNewsUseCase: GetNewsUseCase,
+    private val getNewsFromInternetUseCase: GetNewsFromInternetUseCase,
+    private val getNewsFromDbUseCase: GetNewsFromDbUseCase,
+    private val saveNewsUseCase: SaveNewsUseCase,
+    private val deleteNewsUseCase: DeleteNewsUseCase,
     @Named("ListScreenDispatcher") private val dispatcher: CoroutineDispatcher
 ): ViewModel() {
-    private val _news = MutableStateFlow<List<NewsUi>>(emptyList())
-    val news: StateFlow<List<NewsUi>> get() = _news.asStateFlow()
+    private val _news = MutableStateFlow<List<News>>(emptyList())
+    val news: StateFlow<List<News>> get() = _news.asStateFlow()
 
     private val _message = MutableLiveData<Event<String>>(null)
     val message : LiveData<Event<String>> = _message
@@ -36,16 +37,20 @@ class ListScreenViewModel @Inject constructor(
 
     private fun getNews() {
         viewModelScope.launch(dispatcher) {
-            val news = getNewsUseCase.invoke("mobile")
-            _news.update { news.map {
-                NewsUi(
-                    title = it.storyTitle ?: it.title ?: "",
-                    it.author,
-                    it.createdAt,
-                    it.createdAtI,
-                    it.storyUrl ?: ""
+            val news = getNewsFromInternetUseCase.invoke("mobile")
+            news.map {
+                saveNewsUseCase.invoke(
+                    News(
+                        title = it.storyTitle ?: it.title ?: "",
+                        author = it.author,
+                        createdAt = it.createdAt,
+                        createdAtI = it.createdAtI,
+                        storyUrl = it.storyUrl ?: ""
+                    )
                 )
-            } }
+            }
+            val newsDb = getNewsFromDbUseCase.invoke()
+            _news.update { newsDb }
         }
     }
 
@@ -53,7 +58,7 @@ class ListScreenViewModel @Inject constructor(
         getNews()
     }
 
-    fun onNewsClicked(news: NewsUi, navigationToDetails: (String?, String?) -> Unit) {
+    fun onNewsClicked(news: News, navigationToDetails: (String?, String?) -> Unit) {
         if (news.storyUrl.isNotEmpty()) {
             navigationToDetails(news.storyUrl, news.title)
         } else {
@@ -61,9 +66,11 @@ class ListScreenViewModel @Inject constructor(
         }
     }
 
-    fun removeNews(news: NewsUi) {
-        _news.update {
-            it.filter { it.createdAtI != news.createdAtI }
+    fun removeNews(news: News) {
+        viewModelScope.launch(dispatcher) {
+            deleteNewsUseCase.invoke(news)
+            val newsDb = getNewsFromDbUseCase.invoke()
+            _news.update { newsDb }
         }
         _message.value = Event("Se eliminó la noticia")
     }

@@ -18,16 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import cl.alphacode.reigntest.model.News
+import cl.alphacode.reigntest.entity.News
 import cl.alphacode.reigntest.ui.organism.CardComponent
-import cl.alphacode.reigntest.ui.viewModel.NewsUi
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CardList(
-    news: List<NewsUi>,
-    onCardClicked: (NewsUi) -> Unit = {},
-    onItemRemove: (NewsUi) -> Unit = {}
+    news: List<News>,
+    onCardClicked: (News) -> Unit = {},
+    onItemRemove: (News) -> Unit = {}
 ) {
     LazyColumn(
         Modifier
