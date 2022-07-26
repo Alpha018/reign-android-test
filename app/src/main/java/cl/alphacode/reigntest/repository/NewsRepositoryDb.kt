@@ -1,13 +1,13 @@
 package cl.alphacode.reigntest.repository
 
-import android.util.Log
 import cl.alphacode.reigntest.dao.NewsDao
 import cl.alphacode.reigntest.entity.News
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
 interface NewsRepositoryDb {
-    suspend fun getNews(): List<News>
+    suspend fun getNews(): Flow<List<News>>
     fun saveNews(news: News)
     fun deleteNews(news: News)
 }
@@ -15,14 +15,10 @@ interface NewsRepositoryDb {
 class NewsRepositoryDbImp @Inject constructor(
     private val newsDao: NewsDao
 ) : NewsRepositoryDb {
-    private var news: List<News> = emptyList()
 
-    override suspend fun getNews(): List<News> {
-        kotlin.runCatching {
-            news = newsDao.getAllNews()
-            Log.i("AQUI!!", news.size.toString())
-        }
-        return news
+
+    override suspend fun getNews(): Flow<List<News>> {
+        return newsDao.getAllNews()
     }
 
     override fun saveNews(news: News) {
