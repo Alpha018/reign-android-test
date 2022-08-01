@@ -1,5 +1,6 @@
 package cl.alphacode.reigntest.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -33,6 +34,7 @@ fun MainScreen(
         ).show()
     }
 
+    Log.i("News", newsListResponse.size.toString())
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = refreshing),
         modifier = Modifier

@@ -7,29 +7,24 @@ import androidx.lifecycle.viewModelScope
 import cl.alphacode.reigntest.domain.*
 import cl.alphacode.reigntest.entity.News
 import cl.alphacode.reigntest.event.Event
+import cl.alphacode.reigntest.qualifier.CoroutineDispatcherApi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
 class ListScreenViewModel @Inject constructor(
-    private val getNewsFromInternetUseCase: GetNewsFromInternetUseCase,
-    private val getNewsFromDbUseCase: GetNewsFromDbUseCase,
-    private val saveNewsUseCase: SaveNewsUseCase,
+    private val getNewsUseCase: GetNewsUseCase,
     private val deleteNewsUseCase: DeleteNewsUseCase,
-    @Named("ListScreenDispatcher") private val dispatcher: CoroutineDispatcher
-): ViewModel() {
+    @CoroutineDispatcherApi private val dispatcher: CoroutineDispatcher
+) : ViewModel() {
     private val _news = MutableStateFlow<List<News>>(emptyList())
     val news: StateFlow<List<News>> get() = _news.asStateFlow()
 
     private val _message = MutableLiveData<Event<String>>(null)
-    val message : LiveData<Event<String>> = _message
+    val message: LiveData<Event<String>> = _message
 
     init {
         getNews()
@@ -37,20 +32,10 @@ class ListScreenViewModel @Inject constructor(
 
     private fun getNews() {
         viewModelScope.launch(dispatcher) {
-            val news = getNewsFromInternetUseCase.invoke("mobile")
-            news.map {
-                saveNewsUseCase.invoke(
-                    News(
-                        title = it.storyTitle ?: it.title ?: "",
-                        author = it.author,
-                        createdAt = it.createdAt,
-                        createdAtI = it.createdAtI,
-                        storyUrl = it.storyUrl ?: ""
-                    )
-                )
+            getNewsUseCase.updateInternetNews()
+            getNewsUseCase.invoke().collect {
+                _news.value = it
             }
-            val newsDb = getNewsFromDbUseCase.invoke()
-            _news.update { newsDb }
         }
     }
 
@@ -62,16 +47,14 @@ class ListScreenViewModel @Inject constructor(
         if (news.storyUrl.isNotEmpty()) {
             navigationToDetails(news.storyUrl, news.title)
         } else {
-            _message.value = Event("Problemas con la RED o la respuesta está vacía")
+            _message.postValue(Event("Problemas con la RED o la respuesta está vacía"))
         }
     }
 
     fun removeNews(news: News) {
         viewModelScope.launch(dispatcher) {
             deleteNewsUseCase.invoke(news)
-            val newsDb = getNewsFromDbUseCase.invoke()
-            _news.update { newsDb }
+            _message.postValue(Event("Se eliminó la noticia"))
         }
-        _message.value = Event("Se eliminó la noticia")
     }
 }

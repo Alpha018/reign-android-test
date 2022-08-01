@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import cl.alphacode.reigntest.dao.NewsDao
 import cl.alphacode.reigntest.database.AppDatabase
-import cl.alphacode.reigntest.entity.Converters
 import cl.alphacode.reigntest.provider.NewsProvider
 import dagger.Module
 import dagger.Provides
@@ -13,11 +12,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import javax.inject.Named
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+import cl.alphacode.reigntest.qualifier.CoroutineDispatcherApi
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -56,7 +55,7 @@ class ProviderModule {
     }
 
     @Provides
-    @Named("ListScreenDispatcher")
+    @CoroutineDispatcherApi
     fun provideNewsDispatcher(): CoroutineDispatcher = Dispatchers.IO
 
     companion object {

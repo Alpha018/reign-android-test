@@ -1,16 +1,16 @@
 package cl.alphacode.reigntest.domain
 
 import cl.alphacode.reigntest.entity.News
-import cl.alphacode.reigntest.repository.NewsRepositoryDb
+import cl.alphacode.reigntest.repository.NewsRepository
 import cl.alphacode.reigntest.util.wrapEspressoIdlingResource
 import javax.inject.Inject
 
 class SaveNewsUseCase @Inject constructor(
-    private val newsRepositoryDb: NewsRepositoryDb
+    private val newsRepository: NewsRepository
 ) {
-    operator fun invoke(news: News) {
+    suspend operator fun invoke(news: News) {
         wrapEspressoIdlingResource {
-            return newsRepositoryDb.saveNews(news)
+            return newsRepository.saveNews(news)
         }
     }
 }
